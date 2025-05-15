@@ -62,7 +62,6 @@ Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permi
 - Para pruebas de rol **Analista**, recuerda que el rol debe ser asignado manualmente desde la base de datos (ver README del backend).
 
 ## Vistas
-
 - Login
 ![image](https://github.com/user-attachments/assets/b14c489d-4003-4275-a464-7d0b53d982cf)
 
@@ -83,6 +82,49 @@ Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permi
 ![image](https://github.com/user-attachments/assets/71a05049-f824-45cc-8268-fc8afa754620)
 ![image](https://github.com/user-attachments/assets/a2f3bb3a-306e-456d-8237-1071e66ae4a4)
 ![image](https://github.com/user-attachments/assets/e840165b-b1ee-43d0-aef0-d857dd9fd700)
+
+## Estructura del Proyecto
+
+La estructura del proyecto sigue los principios de organización de código recomendados para Angular, con una arquitectura modular y escalable:
+
+```
+src/
+├── app/                     # Código principal de la aplicación
+│   ├── core/                # Servicios singleton, modelos globales, interceptores, guards
+│   │   ├── guards/          # Protección de rutas (AuthGuard)
+│   │   ├── interceptors/    # Interceptores HTTP (token JWT, error handling)
+│   │   ├── models/          # Interfaces y modelos de datos
+│   │   └── services/        # Servicios compartidos (AuthService, CreditRequestService)
+│   │
+│   ├── features/            # Módulos de características principales
+│   │   ├── auth/            # Autenticación (login, registro)
+│   │   ├── credit-requests/ # Gestión de solicitudes de crédito
+│   │   │   ├── admin/       # Vista de administrador/analista
+│   │   │   └── client/      # Vista de cliente/solicitante
+│   │   ├── dashboard/       # Panel principal del usuario
+│   │   └── layout/          # Componentes de diseño (header, footer, sidebar)
+│   │
+│   ├── shared/              # Componentes, directivas y pipes reutilizables
+│   │   ├── components/      # Componentes compartidos (loading, alerts, etc.)
+│   │   ├── directives/      # Directivas personalizadas
+│   │   └── pipes/           # Pipes personalizados
+│   │
+│   ├── app.component.*      # Componente raíz
+│   ├── app.config.ts        # Configuración global de la aplicación
+│   └── app.routes.ts        # Configuración de rutas principales
+│
+├── assets/                  # Recursos estáticos (imágenes, iconos, etc.)
+├── environments/            # Configuración de entornos (dev, prod)
+└── styles.scss              # Estilos globales
+```
+
+### Descripción de las carpetas principales
+
+- **core**: Contiene los servicios, modelos y utilidades fundamentales que se utilizan en toda la aplicación.
+- **features**: Contiene los módulos de características organizados por dominio.
+- **shared**: Contiene componentes, directivas y pipes que se utilizan en múltiples módulos.
+- **assets**: Contiene recursos estáticos como imágenes, fuentes e iconos.
+- **environments**: Contiene configuraciones específicas para diferentes entornos (desarrollo, producción).
 
 
 ## Scripts útiles
