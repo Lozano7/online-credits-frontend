@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../shared/material.module';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -73,6 +74,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
   
   loginForm: FormGroup = this.fb.group({
     usernameOrEmail: ['', Validators.required],
@@ -88,12 +90,12 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.isLoading = false;
+          this.notificationService.show('Inicio de sesión exitoso');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
-          console.error('Error en login:', error);
-          // Aquí se manejaría el error, por ejemplo mostrando un snackbar
+          this.notificationService.show(error?.error?.message || 'Error en login');
         }
       });
     }

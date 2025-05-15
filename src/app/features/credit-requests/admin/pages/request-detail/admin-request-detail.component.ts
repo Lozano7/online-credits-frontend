@@ -7,6 +7,7 @@ import { CreditRequest, CreditRequestStatus } from '../../../../../core/models/c
 import { Document } from '../../../../../core/models/document.model';
 import { CreditRequestService } from '../../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../../shared/material.module';
+import { NotificationService } from '../../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-admin-request-detail',
@@ -267,6 +268,7 @@ export class AdminRequestDetailComponent implements OnInit {
   private creditRequestService = inject(CreditRequestService);
   private formBuilder = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  private notificationService = inject(NotificationService);
   
   protected CreditRequestStatus = CreditRequestStatus;
   
@@ -324,13 +326,10 @@ export class AdminRequestDetailComponent implements OnInit {
   
   submitEvaluation(): void {
     if (this.evaluationForm.invalid || !this.creditRequest?.id) return;
-    
     const decision = this.evaluationForm.get('decision')?.value;
     const rejectionReason = this.evaluationForm.get('rejectionReason')?.value;
-    
     const newStatus: CreditRequestStatus = 
       decision === 'approve' ? CreditRequestStatus.APPROVED : CreditRequestStatus.REJECTED;
-      
     this.isLoading = true;
     this.creditRequestService.changeStatus(
       this.creditRequest.id, 
@@ -339,11 +338,12 @@ export class AdminRequestDetailComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.isLoading = false;
+        this.notificationService.show('Estado actualizado correctamente');
         this.router.navigate(['/admin/requests']);
       },
       error: (error) => {
-        console.error('Error updating credit request status:', error);
         this.isLoading = false;
+        this.notificationService.show(error?.error?.message || 'Error al actualizar el estado');
       }
     });
   }

@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CreditRequest } from '../../../../core/models/credit-request.model';
 import { User, UserRole } from '../../../../core/models/user.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CreditRequestService } from '../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../shared/material.module';
+import { CreditRequestListComponent } from '../../../credit-requests/pages/list/credit-request-list.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, MaterialModule],
+  imports: [CommonModule, RouterLink, MaterialModule, CreditRequestListComponent],
   template: `
     <div class="dashboard-container">
       <mat-toolbar color="primary">
@@ -76,6 +77,11 @@ import { MaterialModule } from '../../../../shared/material.module';
             </mat-card-actions>
           </mat-card>
         </div>
+
+        <div *ngIf="isClient" class="dashboard-table-section">
+          <h2 class="dashboard-table-title">Historial de Solicitudes</h2>
+          <app-credit-request-list></app-credit-request-list>
+        </div>
       </div>
     </div>
   `,
@@ -123,11 +129,25 @@ import { MaterialModule } from '../../../../shared/material.module';
       background-color: var(--primary-color);
       color: white;
     }
+
+    .dashboard-table-section {
+      margin-top: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 2rem;
+    }
+    .dashboard-table-title {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+    }
   `
 })
 export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private creditRequestService = inject(CreditRequestService);
+  private router = inject(Router);
   
   user: User | null = null;
   myCreditRequests: CreditRequest[] = [];
@@ -168,5 +188,6 @@ export class DashboardComponent implements OnInit {
   
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 } 

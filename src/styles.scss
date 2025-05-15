@@ -7,7 +7,6 @@ html, body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-/* Paleta de colores personalizada para un diseño minimalista */
 :root {
   --primary-color: #2c7be5;
   --accent-color: #6c63ff;
@@ -20,13 +19,11 @@ html, body {
   --card-shadow: 0 0.75rem 1.5rem rgba(18, 38, 63, 0.03);
 }
 
-/* Aplicar tema minimalista */
 body {
   background-color: var(--background-color);
   color: var(--text-color);
 }
 
-/* Estilos para formularios y campos de input */
 .form-field-full {
   width: 100%;
 }
@@ -75,7 +72,6 @@ body {
 .p-3 { padding: 1.5rem; }
 .p-4 { padding: 2rem; }
 
-/* Utilidades para texto */
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 .text-left { text-align: left; }
@@ -126,4 +122,15 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+// Forzar fondo blanco en el panel de opciones de mat-select
+::ng-deep .mat-mdc-select-panel {
+  background: #fff !important;
+  color: var(--text-color, #12263f) !important;
+}
+
+// Fix: Ocultar mat-error dentro del panel de opciones de mat-select
+::ng-deep .mat-mdc-select-panel mat-error {
+  display: none !important;
 }

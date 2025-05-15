@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CreditRequest } from '../../../../core/models/credit-request.model';
 import { CreditRequestService } from '../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../shared/material.module';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-credit-request-form',
@@ -35,28 +36,24 @@ import { MaterialModule } from '../../../../shared/material.module';
                 <div class="form-column">
                   <h3>Información del Crédito</h3>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Monto Solicitado (S/.)</mat-label>
                     <input 
                       matInput 
                       type="number" 
                       formControlName="amount"
-                      min="500"
-                      max="50000" 
+                      min="1000"
                       placeholder="Ingrese el monto que necesita">
-                    <mat-hint>Mínimo S/. 500, máximo S/. 50,000</mat-hint>
+                    <mat-hint>Mínimo S/. 1,000</mat-hint>
                     <mat-error *ngIf="creditRequestForm.get('amount')?.hasError('required')">
                       El monto es obligatorio
                     </mat-error>
                     <mat-error *ngIf="creditRequestForm.get('amount')?.hasError('min')">
-                      El monto mínimo es S/. 500
-                    </mat-error>
-                    <mat-error *ngIf="creditRequestForm.get('amount')?.hasError('max')">
-                      El monto máximo es S/. 50,000
+                      El monto mínimo es S/. 1,000
                     </mat-error>
                   </mat-form-field>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Plazo (meses)</mat-label>
                     <mat-select formControlName="termInMonths">
                       <mat-option [value]="6">6 meses</mat-option>
@@ -72,7 +69,7 @@ import { MaterialModule } from '../../../../shared/material.module';
                     </mat-error>
                   </mat-form-field>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Propósito del Crédito</mat-label>
                     <mat-select formControlName="purpose">
                       <mat-option value="Personal">Personal</mat-option>
@@ -92,24 +89,24 @@ import { MaterialModule } from '../../../../shared/material.module';
                 <div class="form-column">
                   <h3>Información Financiera</h3>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Ingreso Mensual (S/.)</mat-label>
                     <input 
                       matInput 
                       type="number" 
                       formControlName="monthlyIncome"
-                      min="930" 
+                      min="1" 
                       placeholder="Ingrese su ingreso mensual">
-                    <mat-hint>Mínimo sueldo básico (S/. 930)</mat-hint>
+                    <mat-hint>Debe ser mayor a S/. 0</mat-hint>
                     <mat-error *ngIf="creditRequestForm.get('monthlyIncome')?.hasError('required')">
                       El ingreso mensual es obligatorio
                     </mat-error>
                     <mat-error *ngIf="creditRequestForm.get('monthlyIncome')?.hasError('min')">
-                      El ingreso mínimo debe ser al menos S/. 930
+                      El ingreso debe ser mayor a S/. 0
                     </mat-error>
                   </mat-form-field>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Tipo de Empleo</mat-label>
                     <mat-select formControlName="employmentType">
                       <mat-option value="Dependiente">Dependiente</mat-option>
@@ -123,7 +120,7 @@ import { MaterialModule } from '../../../../shared/material.module';
                     </mat-error>
                   </mat-form-field>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Antigüedad Laboral (años)</mat-label>
                     <input 
                       matInput 
@@ -139,7 +136,7 @@ import { MaterialModule } from '../../../../shared/material.module';
                     </mat-error>
                   </mat-form-field>
                   
-                  <mat-form-field appearance="outline" class="full-width">
+                  <mat-form-field appearance="fill" class="full-width">
                     <mat-label>Deuda Actual (S/.)</mat-label>
                     <input 
                       matInput 
@@ -260,6 +257,7 @@ export class CreditRequestFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private creditRequestService = inject(CreditRequestService);
+  private notificationService = inject(NotificationService);
   
   creditRequestForm: FormGroup;
   isEditMode = false;
@@ -268,10 +266,10 @@ export class CreditRequestFormComponent implements OnInit {
   
   constructor() {
     this.creditRequestForm = this.fb.group({
-      amount: [null, [Validators.required, Validators.min(500), Validators.max(50000)]],
+      amount: [null, [Validators.required, Validators.min(1000)]],
       termInMonths: [null, Validators.required],
       purpose: ['', Validators.required],
-      monthlyIncome: [null, [Validators.required, Validators.min(930)]],
+      monthlyIncome: [null, [Validators.required, Validators.min(1)]],
       employmentType: ['', Validators.required],
       workSeniority: [null, [Validators.required, Validators.min(0)]],
       currentDebt: [0, [Validators.required, Validators.min(0)]]
@@ -312,30 +310,30 @@ export class CreditRequestFormComponent implements OnInit {
   
   submitForm(): void {
     if (this.creditRequestForm.invalid) return;
-    
     this.isLoading = true;
     const formData = this.creditRequestForm.value as Partial<CreditRequest>;
-    
     if (this.isEditMode && this.requestId) {
       this.creditRequestService.update(this.requestId, formData).subscribe({
         next: () => {
           this.isLoading = false;
+          this.notificationService.show('Solicitud actualizada correctamente');
           this.router.navigate(['/credit-requests']);
         },
         error: (error) => {
-          console.error('Error updating credit request:', error);
           this.isLoading = false;
+          this.notificationService.show(error?.error?.message || 'Error al actualizar la solicitud');
         }
       });
     } else {
       this.creditRequestService.create(formData as CreditRequest).subscribe({
         next: () => {
           this.isLoading = false;
+          this.notificationService.show('Solicitud creada correctamente');
           this.router.navigate(['/credit-requests']);
         },
         error: (error) => {
-          console.error('Error creating credit request:', error);
           this.isLoading = false;
+          this.notificationService.show(error?.error?.message || 'Error al crear la solicitud');
         }
       });
     }

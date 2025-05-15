@@ -15,13 +15,6 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
+  message: string;
   token: string;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-  };
 } 

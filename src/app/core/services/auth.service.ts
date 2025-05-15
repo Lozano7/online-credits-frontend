@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
@@ -24,15 +25,14 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
-        tap(response => this.setSession(response))
+        tap(response => {
+          this.setToken(response.token);
+        })
       );
   }
 
-  register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData)
-      .pipe(
-        tap(response => this.setSession(response))
-      );
+  register(userData: RegisterRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, userData);
   }
 
   logout(): void {
@@ -54,27 +54,57 @@ export class AuthService {
     return storage ? storage.getItem('auth_token') : null;
   }
 
-  private setSession(authResult: AuthResponse): void {
+  private setToken(token: string): void {
     const storage = this.getLocalStorage();
     if (storage) {
-      storage.setItem('auth_token', authResult.token);
-      storage.setItem('user', JSON.stringify(authResult.user));
+      storage.setItem('auth_token', token);
     }
-    this.currentUserSubject.next(authResult.user as unknown as User);
+    // Decodificar el token y poblar el usuario actual
+    try {
+      const payload = jwtDecode<JwtPayload>(token);
+      // Buscar el rol en 'role' o en el claim estándar de roles
+      const role = payload["role"] || payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || '';
+      const user: User = {
+        id: payload.id,
+        username: payload.username,
+        email: payload.email,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        documentType: payload["documentType"] || '',
+        documentNumber: payload["documentNumber"] || '',
+        phoneNumber: payload["phoneNumber"] || '',
+        role: role as any,
+        status: payload["status"] || 'Active',
+        createdAt: payload["createdAt"] ? new Date(payload["createdAt"]) : undefined,
+        updatedAt: payload["updatedAt"] ? new Date(payload["updatedAt"]) : undefined
+      };
+      this.currentUserSubject.next(user);
+    } catch (e) {
+      this.currentUserSubject.next(null);
+    }
+  }
+
+  private setSession(authResult: AuthResponse): void {
+    // Ya no se usa, pero se deja por compatibilidad si algún otro método lo llama
+    this.setToken(authResult.token);
   }
 
   private loadUserFromStorage(): void {
     const storage = this.getLocalStorage();
     if (!storage) return;
-    const userStr = storage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        this.currentUserSubject.next(user);
-      } catch (e) {
-        console.error('Error parsing stored user', e);
-        this.logout();
-      }
+    const token = storage.getItem('auth_token');
+    if (token) {
+      this.setToken(token);
     }
   }
+}
+
+interface JwtPayload {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  [key: string]: any;
 } 

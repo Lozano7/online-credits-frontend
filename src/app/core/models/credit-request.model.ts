@@ -1,10 +1,6 @@
-import { Document } from './document.model';
-import { User } from './user.model';
 
 export interface CreditRequest {
   id?: number;
-  userId: number;
-  user?: User;
   amount: number;
   termInMonths: number;
   monthlyIncome: number;
@@ -12,16 +8,20 @@ export interface CreditRequest {
   employmentType: string;
   currentDebt: number;
   purpose: string;
-  status: CreditRequestStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
+  status: CreditRequestStatus | string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string | null;
   evaluatedBy?: number;
   evaluationDate?: Date;
-  rejectionReason?: string;
-  approvedAmount?: number;
-  interestRate?: number;
-  monthlyPayment?: number;
-  documents?: Document[];
+  rejectionReason?: string | null;
+  approvedAmount?: number | null;
+  interestRate?: number | null;
+  monthlyPayment?: number | null;
+  userId?: number;
+  userName?: string;
+  userEmail?: string;
+  user?: any;
+  documents?: any[];
 }
 
 export enum CreditRequestStatus {

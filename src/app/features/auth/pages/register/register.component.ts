@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { MaterialModule } from '../../../../shared/material.module';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -140,6 +141,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
   
   registerForm: FormGroup = this.fb.group({
     firstName: ['', Validators.required],
@@ -161,12 +163,12 @@ export class RegisterComponent {
       this.authService.register(this.registerForm.value).subscribe({
         next: () => {
           this.isLoading = false;
+          this.notificationService.show('Registro exitoso');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
-          console.error('Error en registro:', error);
-          // Aquí se manejaría el error, por ejemplo mostrando un snackbar
+          this.notificationService.show(error?.error?.message || 'Error en registro');
         }
       });
     }

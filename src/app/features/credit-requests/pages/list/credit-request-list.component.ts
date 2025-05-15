@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CreditRequest } from '../../../../core/models/credit-request.model';
 import { CreditRequestService } from '../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../shared/material.module';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-credit-request-list',
@@ -55,6 +56,12 @@ import { MaterialModule } from '../../../../shared/material.module';
               <td mat-cell *matCellDef="let request"> {{request.termInMonths}} meses </td>
             </ng-container>
             
+            <!-- Purpose Column -->
+            <ng-container matColumnDef="purpose">
+              <th mat-header-cell *matHeaderCellDef> Propósito </th>
+              <td mat-cell *matCellDef="let request"> {{request.purpose}} </td>
+            </ng-container>
+            
             <!-- Date Column -->
             <ng-container matColumnDef="date">
               <th mat-header-cell *matHeaderCellDef> Fecha </th>
@@ -75,12 +82,24 @@ import { MaterialModule } from '../../../../shared/material.module';
               </td>
             </ng-container>
             
+            <!-- User Column (opcional, si se quiere mostrar el nombre del usuario) -->
+            <ng-container matColumnDef="userName">
+              <th mat-header-cell *matHeaderCellDef> Usuario </th>
+              <td mat-cell *matCellDef="let request"> {{request.userName}} </td>
+            </ng-container>
+            
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef> Acciones </th>
-              <td mat-cell *matCellDef="let request"> 
-                <button mat-icon-button color="primary" [routerLink]="['/credit-requests', request.id]">
+              <td mat-cell *matCellDef="let request">
+                <button mat-icon-button color="primary" [routerLink]="['/credit-requests', request.id]" aria-label="Ver solicitud">
                   <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" *ngIf="request.status === 'Pendiente'" [routerLink]="['/credit-requests', request.id, 'edit']" aria-label="Editar solicitud">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" *ngIf="request.status === 'Pendiente'" (click)="cancelRequest(request)" aria-label="Cancelar solicitud">
+                  <mat-icon>cancel</mat-icon>
                 </button>
               </td>
             </ng-container>
@@ -181,13 +200,15 @@ import { MaterialModule } from '../../../../shared/material.module';
 })
 export class CreditRequestListComponent implements OnInit {
   private creditRequestService = inject(CreditRequestService);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
   
   creditRequests: CreditRequest[] = [];
   filteredRequests: CreditRequest[] = [];
   selectedStatus: string = 'all';
   isLoading = true;
   
-  displayedColumns: string[] = ['id', 'amount', 'term', 'date', 'status', 'actions'];
+  displayedColumns: string[] = ['id', 'amount', 'term', 'purpose', 'date', 'status', 'actions'];
   
   ngOnInit(): void {
     this.loadCreditRequests();
@@ -200,10 +221,13 @@ export class CreditRequestListComponent implements OnInit {
         this.creditRequests = requests;
         this.filterByStatus();
         this.isLoading = false;
+        if (requests.length === 0) {
+          this.notificationService.show('No hay solicitudes realizadas');
+        }
       },
       error: (error) => {
-        console.error('Error loading credit requests:', error);
         this.isLoading = false;
+        this.notificationService.show('Error al cargar las solicitudes');
       }
     });
   }
@@ -225,5 +249,23 @@ export class CreditRequestListComponent implements OnInit {
       case 'Rechazado': return 'rechazadas';
       default: return '';
     }
+  }
+  
+  cancelRequest(request: CreditRequest): void {
+    if (!request.id) return;
+    const confirmCancel = window.confirm('¿Estás seguro de que deseas cancelar esta solicitud?');
+    if (!confirmCancel) return;
+    this.isLoading = true;
+    this.creditRequestService.delete(request.id).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.notificationService.show('Solicitud cancelada correctamente');
+        this.loadCreditRequests();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.notificationService.show('Error al cancelar la solicitud');
+      }
+    });
   }
 } 

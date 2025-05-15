@@ -116,10 +116,6 @@ import { MaterialModule } from '../../../../shared/material.module';
                   Un asesor se pondrá en contacto con usted en las próximas 24 horas para coordinar 
                   la firma de documentos y el desembolso del dinero.
                 </p>
-                <button mat-raised-button color="primary" (click)="downloadApprovalDocument()">
-                  <mat-icon>download</mat-icon>
-                  Descargar Carta de Aprobación
-                </button>
               </div>
             </div>
             
@@ -365,16 +361,10 @@ export class CreditRequestDetailComponent implements OnInit {
   
   cancelRequest(): void {
     if (!this.creditRequest?.id) return;
-    
-    // Aquí se implementaría un diálogo de confirmación
     const confirmation = window.confirm('¿Está seguro que desea cancelar esta solicitud?');
     if (!confirmation) return;
-    
     this.isLoading = true;
-    this.creditRequestService.update(this.creditRequest.id, { 
-      status: CreditRequestStatus.REJECTED,
-      rejectionReason: 'Cancelado por el usuario'
-    }).subscribe({
+    this.creditRequestService.delete(this.creditRequest.id).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/credit-requests']);
@@ -384,11 +374,6 @@ export class CreditRequestDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
-  }
-  
-  downloadApprovalDocument(): void {
-    // Aquí se implementaría la lógica para descargar el documento
-    console.log('Downloading approval document...');
   }
   
   viewDocument(document: Document): void {
