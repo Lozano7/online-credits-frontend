@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CreditRequestStatus } from '../../../../../core/models/credit-request.model';
+import { AuthService } from '../../../../../core/services/auth.service';
 import { CreditRequestService } from '../../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../../shared/material.module';
 
@@ -14,10 +15,6 @@ import { MaterialModule } from '../../../../../shared/material.module';
       <mat-toolbar color="primary">
         <span>Panel de Administración</span>
         <span class="toolbar-spacer"></span>
-        <button mat-button routerLink="/dashboard">
-          <mat-icon>dashboard</mat-icon>
-          Dashboard
-        </button>
         <button mat-button (click)="logout()">
           <mat-icon>exit_to_app</mat-icon>
           Cerrar sesión
@@ -68,7 +65,7 @@ import { MaterialModule } from '../../../../../shared/material.module';
               Ver Todas las Solicitudes
             </button>
             
-            <button mat-raised-button color="accent" routerLink="/admin/requests">
+            <button mat-raised-button color="accent" [routerLink]="['/admin/requests']" [queryParams]="{ status: 'Pendiente' }">
               <mat-icon>assignment</mat-icon>
               Solicitudes Pendientes
             </button>
@@ -148,6 +145,8 @@ import { MaterialModule } from '../../../../../shared/material.module';
 })
 export class AdminDashboardComponent implements OnInit {
   private creditRequestService = inject(CreditRequestService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
   
   pendingCount = 0;
   approvedCount = 0;
@@ -168,6 +167,7 @@ export class AdminDashboardComponent implements OnInit {
   }
   
   logout(): void {
-    // Llamar al servicio de autenticación para logout
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 } 

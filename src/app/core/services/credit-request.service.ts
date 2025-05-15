@@ -54,11 +54,14 @@ export class CreditRequestService {
   }
 
   changeStatus(id: number, status: CreditRequestStatus, reason?: string): Observable<CreditRequest> {
-    // El backend espera un string como body
-    return this.http.put<{ message: string, solicitud: CreditRequest }>(`${this.apiUrl}/${id}/status`, status)
-      .pipe(
-        map(res => res.solicitud)
-      );
+    // El backend espera un string JSON como body y Content-Type: application/json
+    return this.http.put<{ message: string, solicitud: CreditRequest }>(
+      `${this.apiUrl}/${id}/status`,
+      JSON.stringify(status),
+      { headers: { 'Content-Type': 'application/json' } }
+    ).pipe(
+      map(res => res.solicitud)
+    );
   }
 
   getByStatus(status: CreditRequestStatus): Observable<CreditRequest[]> {

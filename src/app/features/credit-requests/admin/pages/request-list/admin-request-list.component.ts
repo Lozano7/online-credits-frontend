@@ -42,7 +42,7 @@ import { MaterialModule } from '../../../../../shared/material.module';
             <!-- User Column -->
             <ng-container matColumnDef="user">
               <th mat-header-cell *matHeaderCellDef> Solicitante </th>
-              <td mat-cell *matCellDef="let request"> {{request.user?.firstName}} {{request.user?.lastName}} </td>
+              <td mat-cell *matCellDef="let request"> {{request.user?.firstName || request.userName || request.username}} {{request.user?.lastName || ''}} </td>
             </ng-container>
             
             <!-- Amount Column -->
@@ -77,12 +77,22 @@ import { MaterialModule } from '../../../../../shared/material.module';
               </td>
             </ng-container>
             
+            <!-- Suggested Approval Column -->
+            <ng-container matColumnDef="suggestedApproval">
+              <th mat-header-cell *matHeaderCellDef> Aprobación Sugerida </th>
+              <td mat-cell *matCellDef="let request">
+                <mat-icon color="primary" *ngIf="request.status === 'Aprobado' && request.monthlyIncome >= 1500">check_circle</mat-icon>
+                <span *ngIf="!(request.status === 'Aprobado' && request.monthlyIncome >= 1500)">-</span>
+              </td>
+            </ng-container>
+            
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef> Acciones </th>
               <td mat-cell *matCellDef="let request"> 
                 <button mat-icon-button color="primary" [routerLink]="['/admin/requests', request.id]">
-                  <mat-icon>visibility</mat-icon>
+                  <mat-icon *ngIf="request.status === 'Pendiente'">assignment_turned_in</mat-icon>
+                  <mat-icon *ngIf="request.status !== 'Pendiente'">visibility</mat-icon>
                 </button>
               </td>
             </ng-container>
@@ -99,6 +109,13 @@ import { MaterialModule } from '../../../../../shared/material.module';
             <mat-icon class="empty-icon">assignment</mat-icon>
             <p>No hay solicitudes de crédito {{getStatusText()}}</p>
           </div>
+        </div>
+        
+        <div class="export-section">
+          <button mat-raised-button color="primary" (click)="downloadExcel()">
+            <mat-icon>download</mat-icon>
+            Descargar Excel
+          </button>
         </div>
       </div>
     </div>
@@ -178,6 +195,12 @@ import { MaterialModule } from '../../../../../shared/material.module';
       background-color: #fde8e8;
       color: #df4759;
     }
+    
+    .export-section {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: flex-end;
+    }
   `
 })
 export class AdminRequestListComponent implements OnInit {
@@ -188,7 +211,7 @@ export class AdminRequestListComponent implements OnInit {
   selectedStatus: string = 'all';
   isLoading = true;
   
-  displayedColumns: string[] = ['id', 'user', 'amount', 'term', 'date', 'status', 'actions'];
+  displayedColumns: string[] = ['id', 'user', 'amount', 'term', 'date', 'status', 'suggestedApproval', 'actions'];
   
   ngOnInit(): void {
     this.loadCreditRequests();
@@ -226,5 +249,21 @@ export class AdminRequestListComponent implements OnInit {
       case 'Rechazado': return 'rechazadas';
       default: return '';
     }
+  }
+  
+  downloadExcel(): void {
+    this.creditRequestService.exportToFile('excel').subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'solicitudes_credito.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        alert('Error al descargar el archivo');
+      }
+    });
   }
 } 

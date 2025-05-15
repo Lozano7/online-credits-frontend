@@ -48,20 +48,24 @@ import { NotificationService } from '../../../../../shared/services/notification
               <div class="detail-section">
                 <h3>Información del Solicitante</h3>
                 <div class="detail-item">
-                  <span class="label">Nombre:</span>
-                  <span>{{creditRequest.user?.firstName}} {{creditRequest.user?.lastName}}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label">Documento:</span>
-                  <span>{{creditRequest.user?.documentType}} {{creditRequest.user?.documentNumber}}</span>
+                  <span class="label">Nombre de usuario:</span>
+                  <span>{{creditRequest.userName || creditRequest.user?.username}}</span>
                 </div>
                 <div class="detail-item">
                   <span class="label">Correo:</span>
-                  <span>{{creditRequest.user?.email}}</span>
+                  <span>{{creditRequest.userEmail || creditRequest.user?.email}}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="label">Teléfono:</span>
-                  <span>{{creditRequest.user?.phoneNumber}}</span>
+                  <span class="label">Ingreso mensual:</span>
+                  <span>S/. {{creditRequest.monthlyIncome | number:'1.2-2'}}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Antigüedad laboral:</span>
+                  <span>{{creditRequest.workSeniority}} años</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Tipo de empleo:</span>
+                  <span>{{creditRequest.employmentType}}</span>
                 </div>
               </div>
               
@@ -89,6 +93,13 @@ import { NotificationService } from '../../../../../shared/services/notification
                 <h3>Motivo de Rechazo</h3>
                 <p>{{creditRequest.rejectionReason}}</p>
               </div>
+              
+              <div class="detail-section" *ngIf="creditRequest.status === CreditRequestStatus.APPROVED && creditRequest.monthlyIncome >= 1500">
+                <div class="auto-eval-message">
+                  <mat-icon color="primary">auto_awesome</mat-icon>
+                  <span>Esta solicitud fue <b>aprobada automáticamente</b> porque el ingreso mensual es mayor a S/. 1,500.</span>
+                </div>
+              </div>
             </div>
             
             <div class="documents-section" *ngIf="creditRequest.documents && creditRequest.documents.length > 0">
@@ -111,16 +122,13 @@ import { NotificationService } from '../../../../../shared/services/notification
               <div class="evaluation-section">
                 <h3>Evaluación</h3>
                 <mat-button-toggle-group formControlName="decision">
-                  <mat-button-toggle value="approve">Aprobar</mat-button-toggle>
-                  <mat-button-toggle value="reject">Rechazar</mat-button-toggle>
+                  <mat-button-toggle value="approve" class="approve-toggle">Aprobar</mat-button-toggle>
+                  <mat-button-toggle value="reject" class="reject-toggle">Rechazar</mat-button-toggle>
                 </mat-button-toggle-group>
                 
                 <mat-form-field *ngIf="showRejectionReasonField()" class="full-width">
                   <mat-label>Motivo del rechazo</mat-label>
                   <textarea matInput formControlName="rejectionReason" rows="3" placeholder="Indique el motivo del rechazo"></textarea>
-                  <mat-error *ngIf="evaluationForm.get('rejectionReason')?.invalid">
-                    Debe proporcionar un motivo para rechazar la solicitud
-                  </mat-error>
                 </mat-form-field>
                 
                 <div class="action-buttons">
@@ -260,6 +268,37 @@ import { NotificationService } from '../../../../../shared/services/notification
       align-items: center;
       background-color: rgba(255, 255, 255, 0.7);
     }
+    
+    .approve-toggle {
+      color: #fff !important;
+      background-color: #43a047 !important;
+    }
+    .approve-toggle.mat-button-toggle-checked {
+      background-color: #388e3c !important;
+      color: #fff !important;
+    }
+    .reject-toggle {
+      color: #fff !important;
+      background-color: #e53935 !important;
+    }
+    .reject-toggle.mat-button-toggle-checked {
+      background-color: #b71c1c !important;
+      color: #fff !important;
+    }
+    
+    .auto-eval-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #e8f5e9;
+      color: #388e3c;
+      border: 1px solid #a5d6a7;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
   `
 })
 export class AdminRequestDetailComponent implements OnInit {
@@ -282,17 +321,6 @@ export class AdminRequestDetailComponent implements OnInit {
   
   ngOnInit(): void {
     this.loadCreditRequest();
-    
-    // Añadir validador condicional para el motivo de rechazo
-    this.evaluationForm.get('decision')?.valueChanges.subscribe(value => {
-      const rejectionReasonControl = this.evaluationForm.get('rejectionReason');
-      if (value === 'reject') {
-        rejectionReasonControl?.setValidators([Validators.required, Validators.minLength(10)]);
-      } else {
-        rejectionReasonControl?.clearValidators();
-      }
-      rejectionReasonControl?.updateValueAndValidity();
-    });
   }
   
   loadCreditRequest(): void {

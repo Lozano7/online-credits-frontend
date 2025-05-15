@@ -91,7 +91,13 @@ export class LoginComponent {
         next: () => {
           this.isLoading = false;
           this.notificationService.show('Inicio de sesión exitoso');
-          this.router.navigate(['/dashboard']);
+          let user: any = null;
+          this.authService.currentUser$.subscribe(u => user = u).unsubscribe();
+          if (user && user.role === 'Analista') {
+            this.router.navigate(['/admin']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         },
         error: (error) => {
           this.isLoading = false;
