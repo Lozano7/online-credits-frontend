@@ -1,59 +1,90 @@
-# OnlineCreditFrontend
+# Online Credit Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.12.
+## Descripción
+Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permite a los usuarios solicitar créditos y a los analistas gestionar y evaluar solicitudes.
 
-## Development server
+## Tecnologías Utilizadas
+- **Framework:** Angular 19 ([Descargar Angular CLI](https://angular.dev/tools/cli))
+- **Node.js:** ([Descargar Node.js](https://nodejs.org/))
+- **Gestor de paquetes:** npm (incluido con Node.js)
+- **Estilos:** Angular Material
 
-To start a local development server, run:
+## Requisitos Previos
+- Node.js (recomendado: versión 18.x o superior)
+- npm (incluido con Node.js)
+- Angular CLI (instalar con `npm install -g @angular/cli`)
+- Git
+- Un navegador moderno (Chrome, Edge, Firefox, etc.)
 
-```bash
-ng serve
-```
+## Instalación y Primeros Pasos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/Lozano7/online-credit-frontend.git
+   cd online-credit-frontend
+   ```
 
-## Code scaffolding
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+3. **Configurar el archivo de entorno:**
+   - Copia el archivo de ejemplo:
+     ```bash
+     cp src/environments/environment.example.ts src/environments/environment.ts
+     ```
+   - Edita `src/environments/environment.ts` y asegúrate de que la URL del backend (`apiUrl`) apunte a tu backend, por ejemplo:
+     ```typescript
+     export const environment = {
+       production: false,
+       apiUrl: 'http://localhost:5150/api'
+     };
+     ```
 
-```bash
-ng generate component component-name
-```
+4. **Levantar el servidor de desarrollo:**
+   ```bash
+   ng serve
+   ```
+   - Abre tu navegador en [http://localhost:4200]
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+5. **(Solución a error común en PowerShell):**
+   Si al ejecutar `ng serve` en PowerShell ves un error como:
+   ```
+   File C:\...\node_modules\@angular\cli\bin\ng.ps1 cannot be loaded because running scripts is disabled on this system.
+   ```
+   Ejecuta este comando en PowerShell como administrador:
+   ```powershell
+   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+   ```
+   Luego vuelve a intentar `ng serve`.
 
-```bash
-ng generate --help
-```
+## Notas adicionales
 
-## Building
+- El frontend está preparado para trabajar con el backend en HTTP (`http://localhost:5150/api`).
+- Si cambias el puerto del backend, actualiza la variable `apiUrl` en el archivo de entorno.
+- Para pruebas de rol **Analista**, recuerda que el rol debe ser asignado manualmente desde la base de datos (ver README del backend).
 
-To build the project run:
+## Scripts útiles
 
-```bash
-ng build
-```
+- **Construir para producción:**
+  ```bash
+  ng build --configuration production
+  ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- **Ejecutar pruebas unitarias:**
+  ```bash
+  ng test
+  ```
 
-## Running unit tests
+- **Ejecutar pruebas end-to-end:**
+  ```bash
+  ng e2e
+  ```
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Recursos adicionales
 
-```bash
-ng test
-```
+- [Documentación oficial de Angular](https://angular.dev/docs)
+- [Angular Material](https://material.angular.io/)
 
-## Running end-to-end tests
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
