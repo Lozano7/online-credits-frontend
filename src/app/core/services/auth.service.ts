@@ -17,6 +17,10 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
+  private getLocalStorage(): Storage | null {
+    return typeof window !== 'undefined' && window.localStorage ? window.localStorage : null;
+  }
+
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
@@ -32,27 +36,37 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
+    const storage = this.getLocalStorage();
+    if (storage) {
+      storage.removeItem('auth_token');
+      storage.removeItem('user');
+    }
     this.currentUserSubject.next(null);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('auth_token');
+    const storage = this.getLocalStorage();
+    return !!(storage && storage.getItem('auth_token'));
   }
 
   getToken(): string | null {
-    return localStorage.getItem('auth_token');
+    const storage = this.getLocalStorage();
+    return storage ? storage.getItem('auth_token') : null;
   }
 
   private setSession(authResult: AuthResponse): void {
-    localStorage.setItem('auth_token', authResult.token);
-    localStorage.setItem('user', JSON.stringify(authResult.user));
+    const storage = this.getLocalStorage();
+    if (storage) {
+      storage.setItem('auth_token', authResult.token);
+      storage.setItem('user', JSON.stringify(authResult.user));
+    }
     this.currentUserSubject.next(authResult.user as unknown as User);
   }
 
   private loadUserFromStorage(): void {
-    const userStr = localStorage.getItem('user');
+    const storage = this.getLocalStorage();
+    if (!storage) return;
+    const userStr = storage.getItem('user');
     if (userStr) {
       try {
         const user = JSON.parse(userStr);

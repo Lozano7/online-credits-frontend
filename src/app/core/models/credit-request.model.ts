@@ -1,6 +1,10 @@
+import { Document } from './document.model';
+import { User } from './user.model';
+
 export interface CreditRequest {
   id?: number;
   userId: number;
+  user?: User;
   amount: number;
   termInMonths: number;
   monthlyIncome: number;
@@ -17,6 +21,7 @@ export interface CreditRequest {
   approvedAmount?: number;
   interestRate?: number;
   monthlyPayment?: number;
+  documents?: Document[];
 }
 
 export enum CreditRequestStatus {

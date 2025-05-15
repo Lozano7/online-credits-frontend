@@ -5,6 +5,9 @@ export interface Document {
   filePath: string;
   uploadDate: Date;
   status: DocumentStatus;
+  title: string;
+  fileType: string;
+  fileSize: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
