@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuditLog } from '../../../../../core/models/audit-log.model';
+import { AuditService } from '../../../../../core/services/audit.service';
 import { MaterialModule } from '../../../../../shared/material.module';
 
 @Component({
@@ -48,16 +49,6 @@ import { MaterialModule } from '../../../../../shared/material.module';
             <ng-container matColumnDef="entity">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> Entidad </th>
               <td mat-cell *matCellDef="let log"> {{log.entityType}} #{{log.entityId}} </td>
-            </ng-container>
-            
-            <!-- Details Column -->
-            <ng-container matColumnDef="details">
-              <th mat-header-cell *matHeaderCellDef> Detalles </th>
-              <td mat-cell *matCellDef="let log">
-                <button mat-icon-button color="primary" (click)="showDetails(log)">
-                  <mat-icon>info</mat-icon>
-                </button>
-              </td>
             </ng-container>
             
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -155,47 +146,22 @@ import { MaterialModule } from '../../../../../shared/material.module';
 })
 export class AuditLogComponent implements OnInit {
   auditLogs: AuditLog[] = [];
-  displayedColumns: string[] = ['timestamp', 'user', 'action', 'entity', 'details'];
+  displayedColumns: string[] = ['timestamp', 'user', 'action', 'entity'];
   isLoading = true;
+  constructor(private auditService: AuditService) {}
   
   ngOnInit(): void {
-    // Aquí cargaríamos los logs de auditoría desde un servicio
-    // Por ahora, usaremos datos de ejemplo
-    setTimeout(() => {
-      this.auditLogs = [
-        {
-          id: 1,
-          timestamp: new Date(),
-          userId: '2',
-          userName: 'Juan Analista',
-          action: 'APPROVE_CREDIT',
-          entityType: 'CreditRequest',
-          entityId: 123,
-          details: 'Aprobó solicitud de crédito por S/. 5,000'
-        },
-        {
-          id: 2,
-          timestamp: new Date(Date.now() - 3600000),
-          userId: '2',
-          userName: 'Juan Analista',
-          action: 'REJECT_CREDIT',
-          entityType: 'CreditRequest',
-          entityId: 124,
-          details: 'Rechazó solicitud de crédito por historial crediticio insuficiente'
-        },
-        {
-          id: 3,
-          timestamp: new Date(Date.now() - 86400000),
-          userId: '3',
-          userName: 'María Supervisora',
-          action: 'UPDATE_USER',
-          entityType: 'User',
-          entityId: 5,
-          details: 'Actualizó información de usuario'
-        }
-      ];
-      this.isLoading = false;
-    }, 1000);
+    this.isLoading = true;
+    this.auditService.getAuditLogs().subscribe({
+      next: (logs) => {
+        this.auditLogs = logs;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.auditLogs = [];
+      }
+    });
   }
   
   applyFilter(event: Event): void {

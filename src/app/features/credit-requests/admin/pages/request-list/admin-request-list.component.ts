@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CreditRequest } from '../../../../../core/models/credit-request.model';
 import { CreditRequestService } from '../../../../../core/services/credit-request.service';
 import { MaterialModule } from '../../../../../shared/material.module';
@@ -205,6 +205,7 @@ import { MaterialModule } from '../../../../../shared/material.module';
 })
 export class AdminRequestListComponent implements OnInit {
   private creditRequestService = inject(CreditRequestService);
+  private route = inject(ActivatedRoute);
   
   creditRequests: CreditRequest[] = [];
   filteredRequests: CreditRequest[] = [];
@@ -214,7 +215,12 @@ export class AdminRequestListComponent implements OnInit {
   displayedColumns: string[] = ['id', 'user', 'amount', 'term', 'date', 'status', 'suggestedApproval', 'actions'];
   
   ngOnInit(): void {
-    this.loadCreditRequests();
+    this.route.queryParams.subscribe(params => {
+      if (params['status']) {
+        this.selectedStatus = params['status'];
+      }
+      this.loadCreditRequests();
+    });
   }
   
   loadCreditRequests(): void {
