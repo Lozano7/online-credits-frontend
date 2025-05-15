@@ -34,7 +34,7 @@ Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permi
      ```bash
      cp src/environments/environment.example.ts src/environments/environment.ts
      ```
-   - Edita `src/environments/environment.ts` y asegúrate de que la URL del backend (`apiUrl`) apunte a tu backend, por ejemplo:
+    - Edita `src/environments/environment.ts` **y** `src/environments/environment.development.ts` y asegúrate de que la URL del backend (`apiUrl`) apunte a tu backend, por ejemplo:
      ```typescript
      export const environment = {
        production: false,
