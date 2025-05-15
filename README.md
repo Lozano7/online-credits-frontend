@@ -20,7 +20,7 @@ Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permi
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/Lozano7/online-credit-frontend.git
+   git clone https://github.com/Lozano7/online-credits-frontend.git
    cd online-credit-frontend
    ```
 
