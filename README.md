@@ -61,6 +61,30 @@ Frontend de la plataforma de créditos en línea, desarrollado en Angular. Permi
 - Si cambias el puerto del backend, actualiza la variable `apiUrl` en el archivo de entorno.
 - Para pruebas de rol **Analista**, recuerda que el rol debe ser asignado manualmente desde la base de datos (ver README del backend).
 
+## Vistas
+
+- Login
+![image](https://github.com/user-attachments/assets/b14c489d-4003-4275-a464-7d0b53d982cf)
+
+- Registro
+![image](https://github.com/user-attachments/assets/7169ee42-a5a4-4b15-9dd6-fbdca495fdfd)
+
+- Analista
+![image](https://github.com/user-attachments/assets/583ec0f1-60a1-46df-acb8-9e0122c0a64b)
+![image](https://github.com/user-attachments/assets/35790c7e-c7d2-427d-946d-b780a1c2c1b9)
+![image](https://github.com/user-attachments/assets/a161fdf8-6d10-4ba5-a24a-4cc1ea5c53aa)
+![image](https://github.com/user-attachments/assets/742734ed-feea-43a8-bfdb-478ee01e8c56)
+![image](https://github.com/user-attachments/assets/b58460db-7f30-4d29-a628-90e33ee95f8f)
+![image](https://github.com/user-attachments/assets/d0dabb44-e56c-4aaa-a9f9-f71825775f42)
+
+- Solicitante
+![image](https://github.com/user-attachments/assets/0d90a66e-d81e-4bd2-8391-9ed9410c08ab)
+![image](https://github.com/user-attachments/assets/bab01d8c-4171-44c8-bbda-9bfc16dfc813)
+![image](https://github.com/user-attachments/assets/71a05049-f824-45cc-8268-fc8afa754620)
+![image](https://github.com/user-attachments/assets/a2f3bb3a-306e-456d-8237-1071e66ae4a4)
+![image](https://github.com/user-attachments/assets/e840165b-b1ee-43d0-aef0-d857dd9fd700)
+
+
 ## Scripts útiles
 
 - **Construir para producción:**
